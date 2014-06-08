@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window caption="0,0,0,30" size="700,550" mininfo="250,240" sizebox="4,4,4,4">
+	<Font name="微软雅黑" size="20" />
+	<Font name="微软雅黑" size="12" default="true"/>
+	<Font name="微软雅黑" size="16" bold="false"/>
+	<VerticalLayout name="clientarea" bkcolor="0xFF909090" bkimage="886e404c718735962095db552e7d394c.jpg">
+		<HorizontalLayout height="30">
+			<HorizontalLayout inset="5,5,0,0" mousechild="false">
+				<Label name="title" text="<Tiny Rss Reader>" textcolor="0xFFFF0000" font="0"/>
+			</HorizontalLayout>
+			<HorizontalLayout width="75">
+				<Button name="minbtn" width="25" height="25" text="-" tooltip="Minimize" />
+				<Button name="maxbtn" width="25" height="25" text="O" tooltip="Maximize" />
+				<Button name="closebtn" width="25" height="25" text="X" tooltip="Close Window" />
+			</HorizontalLayout>
+		</HorizontalLayout>
+		<HorizontalLayout inset="10,10,10,10">
+			<RssSourceList name="rss_sources" width="200" vscrollbar="true" header="hidden" bordersize="1" bordercolor="0xFFFF0000" inset="5,5,5,5" menu="true">
+
+			</RssSourceList>
+			<Control width="5" />
+			<VerticalLayout>
+				<RssAuthor name="author_info" bordersize="1" bordercolor="0xFFFF0000" inset="5,5,5,5">
+					<Label />
+					<Label />
+					<Label />
+				</RssAuthor>
+				<Control height="5" />
+				<VerticalLayout>
+					<VerticalLayout bordersize="1" bordercolor="0xFFFF0000">
+						<RssItemListTab name="rss_list_tabs">
+						
+						</RssItemListTab>
+						<!-- Label name="waitlbl" bkcolor="0xFF000000" textcolor="0xFFFFFFFF" text="正在刷新..." align="center" float="true" pos="50,50,150,110" /-->
+					</VerticalLayout>
+				</VerticalLayout>
+			</VerticalLayout>
+		</HorizontalLayout>
+	</VerticalLayout>
+</Window>

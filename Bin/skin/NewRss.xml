@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window caption="0,0,0,30" size="250,190">
+	<Font name="微软雅黑" size="12" default="true"/>
+	<VerticalLayout name="clientarea" bkcolor="0xFFFFFFFF" bordersize="1" bordercolor="0xFFF0F0F0">
+		<HorizontalLayout height="30" inset="3,3,3,3">
+			<Label text="新RSS源" />
+			<Button name="closebtn" text="X" bkcolor="0xFFFF0000" width="20" height="20"/>
+		</HorizontalLayout>
+		<VerticalLayout inset="5,5,5,5">
+			<VerticalLayout inset="5,5,5,5" bordersize="1" bordercolor="0xFF0000FF">
+				<HorizontalLayout height="24">
+					<Label text="标题:" width="30"/>
+					<RichEdit name="ri_title" autohscroll="true"/>
+				</HorizontalLayout>
+				<HorizontalLayout height="24">
+					<Label text="地址:" width="30"/>
+					<RichEdit name="ri_link" autohscroll="true"/>
+				</HorizontalLayout>
+				<HorizontalLayout height="24">
+					<Label text="分类:" width="30"/>
+					<RichEdit name="ri_category" autohscroll="true"/>
+				</HorizontalLayout>
+			</VerticalLayout>
+			<HorizontalLayout height="30" inset="0,10,0,0">
+				<Control />
+				<Button text="确定" name="btnOK" pos="0,0,30,20" bordersize="1" bordercolor="0xFFFF0000"/>
+				<Control width="10" />
+				<Button text="取消" name="btnCancel" pos="0,0,30,20" bordersize="1" bordercolor="0xFFFF0000"/>
+			</HorizontalLayout>
+		</VerticalLayout>
+	</VerticalLayout>
+</Window>
