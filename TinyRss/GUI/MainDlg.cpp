@@ -559,18 +559,18 @@ protected:
 				Close();
 			}
 			else if(name == _T("maxbtn")){
-				if(::IsZoomed(GetHWND())){
-					SendMessage(WM_SYSCOMMAND, SC_RESTORE);
-				}
-				else{
-					SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
-				}
+				SendMessage(WM_SYSCOMMAND, SC_RESTORE);
+				msg->pSender->SetName(_T("restorebtn"));
+			}
+			else if(name == _T("restorebtn")){
+				SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
+				msg->pSender->SetName(_T("maxbtn"));
 			}
 			else if(name == _T("minbtn")){
 				SendMessage(WM_SYSCOMMAND, SC_MINIMIZE);
 			}
 		}
-		return true;
+		return false;
 	}
 protected:
 	virtual CControlUI* CreateControl(LPCTSTR pstrClass) override
