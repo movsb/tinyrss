@@ -786,6 +786,29 @@ protected:
 					return;
 				}
 				break;
+			case RSSSOURCEUIMENU_REFRESHALL:
+				{
+					auto sz = m_pRssSources->GetCount();
+					for(auto i=0; i<sz; ++i){
+						auto p = static_cast<CRssSourceUI*>(m_pRssSources->GetItemAt(i));
+
+						CRssSourceRefresh* pRefresh = nullptr;
+						if(!(pRefresh=p->GetRefresh())){
+							pRefresh = new CRssSourceRefresh;
+							pRefresh->hEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
+							pRefresh->pManager = m_rss;
+							pRefresh->pObject = p;
+							pRefresh->pRssSource = p->GetSource()->pRss;
+							p->SetRefresh(pRefresh);
+							GetManager()->SetTimer(p, CRssSourceUI::kRefreshTimerID, 1000);
+							HANDLE hThread = (HANDLE)::_beginthreadex(nullptr, 0, 
+								reinterpret_cast<unsigned int (__stdcall*)(void*)>(ThreadProcOfRefresh), 
+								(void*)pRefresh, 0, nullptr);
+							::CloseHandle(hThread);
+						}
+					}
+					return ;
+				}
 			case RSSSOURCEUIMENU_NEWSOURCE:
 				{
 					class CNewSource : public INewRssDlgCallback
