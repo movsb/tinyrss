@@ -722,6 +722,7 @@ protected:
 				else{
 					s2 = s;
 				}
+
 				auto sz = m_pRssSources->GetCount();
 				for(auto i=0; i<sz; ++i){
 					auto pctrl = static_cast<CRssSourceUI*>(m_pRssSources->GetItemAt(i));
