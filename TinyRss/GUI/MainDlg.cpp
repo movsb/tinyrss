@@ -11,6 +11,48 @@ using namespace DuiLib;
 fstream __debug_file;
 CRssManager* theRss;
 
+class CRssSourceFilterUI : public CHorizontalLayoutUI
+{
+public:
+	CRssSourceFilterUI(){}
+	static LPCTSTR GetUIClass()
+	{
+		return _T("RssSourceFilter");
+	}
+
+protected:
+	virtual void DoInit()override
+	{
+		__super::DoInit();
+
+		m_lblPrompt = GetItemAt(0)->ToLabelUI();
+		m_riText = GetItemAt(1)->ToRichEditUI();
+		SMART_ASSERT(m_lblPrompt && m_riText).Fatal();
+		LayoutControls();
+	}
+
+private:
+	void LayoutControls()
+	{
+		SIZE szPrompt = CRenderEngine::GetTextSize(
+			GetManager()->GetPaintDC(),GetManager(),
+			m_lblPrompt->GetText(),m_lblPrompt->GetFont(),0);
+		auto iHeightText = GetManager()->GetFontInfo(m_riText->GetFont())->tm.tmHeight;
+
+		m_lblPrompt->SetFixedWidth(szPrompt.cx+4);
+
+		auto thisheight = max(szPrompt.cy, iHeightText)+8;
+		SetFixedHeight(thisheight);
+
+		auto inset = (thisheight-iHeightText)/2;
+		m_riText->SetInset(CDuiRect(0,inset,0,inset));
+	}
+
+private:
+	CLabelUI*		m_lblPrompt;
+	CRichEditUI*	m_riText;
+};
+
 // 这是作者信息栏: 右上角那一块
 class CRssAuthorUI : public CVerticalLayoutUI
 {
@@ -578,6 +620,7 @@ protected:
 		if(_tcscmp(pstrClass, CRssAuthorUI::GetUIClass())==0) return new CRssAuthorUI;
 		else if(_tcscmp(pstrClass, CRssSourceListUI::GetUIClass())==0) return new CRssSourceListUI;
 		else if(_tcscmp(pstrClass, CRssItemListTabUI::GetUIClass())==0) return new CRssItemListTabUI;
+		else if(_tcscmp(pstrClass, CRssSourceFilterUI::GetUIClass())==0) return new CRssSourceFilterUI;
 		return nullptr;
 	}
 	virtual CDuiString GetSkinFolder() override
@@ -650,26 +693,7 @@ protected:
 				m_pRssAuthor->Empty();
 				m_pRssListTabs->SelectItem(m_pRssSources->GetCurSel());
 				auto pRss = m_pRssListTabs->GetCurListUI()->GetRssSource();
-// 				if(!pRss->RssItems.size()){
-// 					try{
-// 						m_rss->GetRssSource(m_pRssSources->GetCurSourceUI()->GetSource(),pRss);
-// 						auto pList = m_pRssListTabs->GetCurListUI();
-// 						for(auto rss : pRss->RssItems){
-// 							auto p = new CRssItemUI;
-// 							p->SetRssItem(rss);
-// 							p->SetTitle(rss->strTitle.c_str());
-// 							p->SetLink(rss->strLink.c_str());
-// 							p->SetDescription(rss->strDescription.c_str());
-// 							p->SetRead(rss->bRead);
-// 
-// 							pList->Add(p);
-// 						}
-// 					}
-// 					catch(const char* msg){
-// 						::MessageBox(GetHWND(), msg, nullptr, MB_ICONERROR);
-// 						return;
-// 					}
-// 				}
+
 				m_pRssAuthor->SetTitle(pRss->strTitle.c_str());
 				m_pRssAuthor->SetLink(pRss->strLink.c_str());
 				m_pRssAuthor->SetDescription(pRss->strDescription.c_str());
@@ -682,6 +706,35 @@ protected:
 				::ShellExecute(GetHWND(),"open",pItem->GetRssItem()->strLink.c_str(),nullptr,nullptr,SW_SHOWNORMAL);
 				auto rlink = m_pRssListTabs->GetCurListUI()->GetRssSource()->pSource->source.c_str();
 				SMART_ENSURE(m_rss->GetDB()->MarkCacheAsRead(rlink, pItem->GetRssItem()->strLink.c_str()),==true).Fatal();
+				return;
+			}
+		}
+
+		if(msg.pSender->GetName() == _T("rssfilter")){
+			if(msg.sType == DUI_MSGTYPE_RETURN){
+				CDuiString s = msg.pSender->GetText();
+				CDuiString s1,s2;	// 分类(可选)|标题
+				int pos = s.Find(_T('|'));
+				if(pos != -1){
+					s1 = s.Left(pos);
+					s2 = s.Mid(pos+1);
+				}
+				else{
+					s2 = s;
+				}
+				auto sz = m_pRssSources->GetCount();
+				for(auto i=0; i<sz; ++i){
+					auto pctrl = static_cast<CRssSourceUI*>(m_pRssSources->GetItemAt(i));
+					auto pSource = pctrl->GetSource();
+					if(_tcsstr(pSource->category.c_str(), s1)
+						&& _tcsstr(pSource->title.c_str(), s2))
+					{
+						pctrl->SetVisible(true);
+					}
+					else{
+						pctrl->SetVisible(false);
+					}
+				}
 				return;
 			}
 		}
@@ -793,7 +846,7 @@ protected:
 						auto p = static_cast<CRssSourceUI*>(m_pRssSources->GetItemAt(i));
 
 						CRssSourceRefresh* pRefresh = nullptr;
-						if(!(pRefresh=p->GetRefresh())){
+						if(p->IsVisible() && !(pRefresh=p->GetRefresh())){
 							pRefresh = new CRssSourceRefresh;
 							pRefresh->hEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 							pRefresh->pManager = m_rss;
