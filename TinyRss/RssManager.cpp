@@ -171,6 +171,39 @@ bool CRssParser::Parse(const char* xml, CRssSource* R)
 
 bool CRssParser::transEncoding(const char* xml, string* str)
 {
+	// test xml encoding type
+	std::vector<char> strDecl;
+	const char* pDecl = xml;
+	while(*pDecl && *pDecl != '\n' && *pDecl !='\r'){ // no xml would be in one line, is it?
+		strDecl.push_back(*pDecl);
+		++pDecl;
+	}
+	strDecl.push_back('\0');
+
+	pDecl = reinterpret_cast<const char*>(&strDecl[0]);
+	auto pEncoding = strstr(pDecl, "encoding");
+	if(pEncoding){
+		while(*pEncoding && *pEncoding!='"')
+			pEncoding++;
+		if(*pEncoding) pEncoding++; // skip quot
+		
+		char* pEnd = const_cast<char*>(pEncoding);
+		while(*pEnd && *pEnd != '"')
+			pEnd++;
+		*pEnd = '\0';
+		if(!_stricmp(pEncoding, "UTF8")
+			|| !_stricmp(pEncoding, "UTF-8"))
+		{
+		}
+		else{
+			*str = xml;
+			return true;
+		}
+	}
+	else{
+		// if no encoding specified, treats as utf-8
+	}
+
 	*str = Utf82Ansi(xml);
 	return true;
 }
