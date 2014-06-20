@@ -163,6 +163,7 @@ public:
 		m_pCategory = new CLabelUI;
 		pVert->Add(m_pTitle);
 		pVert->Add(m_pCategory);
+
 		Add(pVert);
 	}
 
@@ -197,6 +198,11 @@ public:
 	}
 
 protected:
+	virtual void SetPos(RECT rc) override
+	{
+		__super::SetPos(rc);
+	}
+
 	virtual void DoInit() override
 	{
 		__super::DoInit();
@@ -727,8 +733,11 @@ protected:
 				for(auto i=0; i<sz; ++i){
 					auto pctrl = static_cast<CRssSourceUI*>(m_pRssSources->GetItemAt(i));
 					auto pSource = pctrl->GetSource();
-					if(_tcsstr(pSource->category.c_str(), s1)
-						&& _tcsstr(pSource->title.c_str(), s2))
+					CDuiString ca(pSource->category.c_str());
+					CDuiString ti(pSource->title.c_str());
+
+					if(ca.Find(s1, 0, false) != -1
+						&& ti.Find(s2, 0, false) != -1)
 					{
 						pctrl->SetVisible(true);
 					}
